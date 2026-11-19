@@ -1,0 +1,6 @@
+{
+  "roof": ["MATERIAL tbd", "CODE the code edition at build", "WIND the design wind zone"],
+  "hvac": ["BRAND model TBD", "FILTER: cadence", "CONDENSATE: cadence"],
+  "plumbing": ["WATER HEATERS: one row per unit, fuel and what it serves"],
+  "calendar": ["WATER: your assigned day", "RESTRICTIONS: the current district order"]
+}

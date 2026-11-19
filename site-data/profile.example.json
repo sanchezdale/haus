@@ -1,0 +1,36 @@
+{
+  "identity": {
+    "builder": "TBD (from the interview)",
+    "plan": "TBD",
+    "built": "YYYY",
+    "closing_date": "YYYY-MM-DD or TBD",
+    "lot": "TBD",
+    "area": "City, ST ZIP",
+    "county": "TBD"
+  },
+  "house": {
+    "stories": 0,
+    "sqft": "TBD",
+    "floor_plan": "awaiting drop (PDF or photo)",
+    "survey": "awaiting drop (PDF or photo)"
+  },
+  "systems": [
+    { "name": "System name", "detail": "manufacturer, model, or TBD", "page": "slug.html" },
+    { "name": "Second unit where relevant (example: water heater 2)", "detail": "fuel, what it serves", "page": "slug.html" }
+  ],
+  "yard": {
+    "lawn": "grass type",
+    "trees": "count and types",
+    "lawn_company": "TBD (name, service days, winter cadence)",
+    "watering": "current district restrictions with expiry"
+  },
+  "automation": {
+    "status": "home automation platform, if any",
+    "detail": "What the house does by itself, summarized in household language from the platform export."
+  },
+  "documents": [
+    { "label": "Closing packet", "status": "awaiting drop", "unlocks": "exact closing date, vendor list, what the builder warranted" },
+    { "label": "Floor plan", "status": "awaiting drop", "unlocks": "room dimensions" },
+    { "label": "Survey", "status": "awaiting drop", "unlocks": "lot boundaries, easements" }
+  ]
+}
