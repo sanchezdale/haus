@@ -48,3 +48,8 @@ Any generator that honors those contracts works: the runtime scripts, the skills
 ## Privacy
 
 Your manual contains real details about a real house. Keep your clone private, serve it on your tailnet, and put any public host behind Cloudflare Access.
+
+## License
+
+MIT. Fork it, clone it, change the generator, host your manual however you like.
+
