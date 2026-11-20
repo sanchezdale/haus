@@ -7,7 +7,7 @@ It was built agent-first, for a real house: the skills encode the sourcing rules
 ## The recommended path
 
 1. **Fork or clone this repo.** Your copy is your manual; keep it private, because once you run setup it will hold your house's details. A fork also gives you updates to the engine and skills whenever they land here.
-2. **Open your clone in an agent.** Any capable agent works: the skills are plain markdown contracts. OpenCode registers them from `skills/` via the project config; Claude Code and other SKILL.md-compatible agents via the installer below; agents with no skills mechanism (Codex and friends) read `AGENTS.md` at the repo root, which points them at the same files.
+2. **Open your clone in an agent.** Any capable agent works: the skills are plain markdown contracts in the standard Agent Skills format. OpenCode registers them from `skills/` via the project config; every other agent installs them with one command (below).
 3. **Say "run haus-setup".** It interviews you: builder and plan, closing date, every system and appliance, lawn and trees, county, documents you can share. It researches each system with primary sources, proposes the markdown and data files, and writes them only after you approve.
 4. **Publish from your clone:**
    ```sh
@@ -30,18 +30,17 @@ docs/                 convention for private documents (closing packet, floor pl
 
 ## Install the skills anywhere
 
-The canonical skills live in `skills/`. To use them in other agents and outside this repo:
+The skills follow the open [Agent Skills](https://github.com/vercel-labs/skills) format and live in `skills/`, one of its standard container locations, so the `skills` CLI discovers them with no manifest:
 
 ```sh
-./skills/install.sh             # symlinks both skills into:
-                                #   ~/.config/opencode/skills  (OpenCode global)
-                                #   ~/.claude/skills            (Claude Code)
-                                #   ~/.agents/skills            (cross-agent convention)
-./skills/install.sh claude      # just one target; targets: opencode, claude, agents, all
-./skills/install.sh --copy all # copy instead of symlink, for agents that do not follow links
+npx skills add sanchezdale/haus          # from GitHub: pick skills and agents, project scope
+npx skills add sanchezdale/haus -g       # global: available in every project
+npx skills add .                        # from a local clone of this repo
+npx skills add sanchezdale/haus -l       # list what it finds, install nothing
+npx skills update                        # update installed skills later
 ```
 
-Symlinks keep this repo the single source of truth: pulling updates here updates every agent. Agents with no skills mechanism at all read `AGENTS.md` in the repo root, which tells them to load the same SKILL.md files on the same trigger phrases.
+Requires Node.js 22.20 or later. The CLI supports OpenCode, Claude Code, Codex, Cursor, and 75 more agents, and project installs land in `.agents/skills/` with links per agent. The CLI collects anonymous telemetry; set `DO_NOT_TRACK=1` to disable it. To keep a local clone as the single source of truth, run `npx skills add <path-to-your-clone> -g` and pull updates in the clone.
 
 ## The build is swappable
 
