@@ -1,5 +1,5 @@
 ---
-name: House Update
+name: haus-update
 description: Add to or change an existing House Manual. Verbs cover adding assets, logging receipts, setting the closing date, importing a Home Assistant export, updating per-page tags, closing known issues, and starting projects. Use when the user mentions changing, adding, logging, or updating anything about their house.
 ---
 

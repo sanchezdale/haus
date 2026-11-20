@@ -1,5 +1,5 @@
 ---
-name: House Setup
+name: haus-setup
 description: Bootstrap a complete homeowner manual for any house. Discovers the tools and sources available, researches the house behind the scenes (county public records, builder plans, floor plan hunt), then runs a guided intake against a defined must-have list, and writes the sourced knowledge markdown and data files. Use when the user asks to set up a new house, recreate this manual for another home, or rerun the wizard.
 ---
 
