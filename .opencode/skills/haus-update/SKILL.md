@@ -7,7 +7,7 @@ description: Add to or change an existing House Manual. Verbs cover adding asset
 
 Changes an existing house manual built with the `haus-setup` skill. Same quality bar, same approval-first rule: show the exact proposed change, get a yes, write, rebuild, verify, commit.
 
-Read `.opencode/skills/haus-setup/SKILL.md` for the repo layout, the markdown contracts the build parser depends on, and the sourcing rules before the first run of a session.
+Read `.opencode/skills/haus-setup/SKILL.md` for the repo layout, the markdown contracts the build parser depends on, the sourcing rules, the must-have list that defines a complete manual, and the phase 0 consent rule (never open a source the user declined) before the first run of a session.
 
 ## How every update runs
 
@@ -41,6 +41,10 @@ Per-page tag strips. Edit `site-data/tags.json` only. Relevance rule: each page 
 ### close-issue
 
 A known issue is resolved. Rewrite its item in the `## The three known issues` section of `00-index.md`: keep the item, append `Resolved <date>: <one line how>.` in the item text. If the issue list shrinks or grows, update the section heading's count and tell the user which offsets (30d, 1y, 2y) the remaining items now map to, since the first three items drive the Overview cards in order.
+
+### complete-pass
+
+The room-by-room completeness pass from the setup skill against an existing manual: walk the HUD toolkit's room checklist plus the must-have list, list every gap (areas never covered, systems recorded without a Cadence table, appliances missing warranty rows), and propose the writes that close them. Cite the anchors for anything new.
 
 ### start-project
 

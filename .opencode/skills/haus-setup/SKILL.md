@@ -1,6 +1,6 @@
 ---
 name: House Setup
-description: Bootstrap a complete homeowner manual for any house. Runs the intake interview, parses documents, researches each system with primary sources, writes the knowledge markdown and data files, and rebuilds the static site. Use when the user asks to set up a new house, recreate this manual for another home, or rerun the wizard.
+description: Bootstrap a complete homeowner manual for any house. Discovers the tools and sources available, researches the house behind the scenes (county public records, builder plans, floor plan hunt), then runs a guided intake against a defined must-have list, and writes the sourced knowledge markdown and data files. Use when the user asks to set up a new house, recreate this manual for another home, or rerun the wizard.
 ---
 
 # House Setup
@@ -8,6 +8,20 @@ description: Bootstrap a complete homeowner manual for any house. Runs the intak
 Recreates the House Manual for any house at the same quality bar as the original build (a 2025-26 Pulte Yorkshire in Florida). The product is: one sourced markdown file per system, `site-data/profile.json` + `site-data/tags.json`, and a rebuilt static site. Approval-first: propose every file change and get the user's yes before writing anything.
 
 The quality bar is the product. A manual without inline sources is a failed run.
+
+## The must-have list (the prescriptive bar)
+
+This skill, not the LLM at run time, defines what a complete manual covers. The bar comes from a three-layer anchor of reviewed guides, cited inline:
+
+1. Primary anchor: [UGA Extension Circular 1082, Home Maintenance Checklist](https://extension.uga.edu/publications/detail.html?number=C1082). Twelve areas: exterior, yard, windows and walls, roof and attic, appliances, plumbing and bathrooms, electrical, heating and cooling, basement or crawl space, garage, safety. The seasonal backbone.
+2. Hazard and health layer: [NCHH Healthy Homes Maintenance Checklist](https://nchh.org/resource-library/healthy-homes-maintenance-checklist_english.pdf). Adds annual and as-needed cadences plus the Pro Needed judgment (which tasks need a professional). HUD's own toolkit references this checklist.
+3. Completeness pass: [HUD Healthy Housing Toolkit, June 2024 revision](https://files.hudexchange.info/resources/documents/Healthy-Housing-Toolkit-for-Housing-Counselors.pdf). Eight Principles of a healthy home plus the room-by-room check; run it at the end of intake to catch what system lists miss (blind cords, tip-over anchors, pre-1978 lead paint, radon).
+
+Per-module depth: [ASHI Home Systems pages](https://www.homeinspector.org/for-consumers/homeowner-resources/home-systems) as the standard per-system reference (what to look for, written by inspectors), alongside the manufacturer documents.
+
+On top of the anchors, haus adds what no published guide has: the county hazard pack, warranty windows, and the personal extras from the intake (measurements, colors, rooms, home automation).
+
+Completeness rule: a house that lacks an area (no basement, no garage, no pool) records it as not-present in the profile, never silently skipped, so the next reader knows the omission was deliberate.
 
 ## Repo layout and build contracts
 
@@ -50,29 +64,38 @@ Read these before writing anything:
 
 `site-data/tags.json`: `{"<slug>": ["CHIP TEXT", ...]}`. Per-page relevance rule: a page shows only the facts that matter to that system. The roof page never mentions the pool; the HVAC page does not mention the cage.
 
-## Phase 1: intake interview
+## Phase 0: discover sources, get consent
 
-Ask these in one pass, accept partial answers, and record what is still unknown as TBD rather than guessing:
+Before asking the user anything, enumerate what the current harness can reach: browser, web search, email (the `himalaya` skill when mail is connected), drive or workspace MCPs, local file access. Announce them in one line per source ("I can search your Gmail for receipts and warranty registrations, browse the county records site, read local files you point me at") and get one consent covering what they approve.
 
-1. Address or ZIP (and county if known). Drives the location pack.
-2. Builder and plan name, or custom. Cookie-cutter plans (Pulte, Lennar, DR Horton, KB, Taylor Morrison) are findable on the web: search the plan name plus the builder, find elevations and standard inclusions, and cite what you find. Label the plan details as inference when the builder has not confirmed them for this specific house.
-3. Closing date, or a closing packet PDF to parse it from.
-4. Systems walkthrough, one at a time:
-   - HVAC: brand and model, or a photo of the data plate. Filter size if known.
-   - Water: count every unit, fuel type, and what it serves (a pool heater is a separate unit).
-   - Appliances: brand, model, purchase source. Offer the email lookup path: with permission, search the user's mail via the `himalaya` skill for order confirmations and warranty registrations. Otherwise receipts, photos, or manual entry.
-   - Exterior: siding material and manufacturer if known, roof material and age, irrigation, trees by count and type.
-   - Pool, cage, generator, softener, water treatment, pest contract: present or absent, with details.
-5. Home automation: is there a Home Assistant or similar export? Ask for it now, use it in phase 4.
-6. Documents: closing packet, floor plan, survey. For each, tell the user what it unlocks and ask where they want it stored: the repo `docs/` folder (private, local) or a link they provide. Never copy a document into `site/`: everything there is published.
-7. Known issues: anything visible, recurring, or worrying. These become the issue cards.
-8. Who uses the manual: household members. Sets the tone; the site assumes non-technical readers.
+- Anything declined is off-limits for the whole run; never open a declined source later.
+- Offer the private alternative up front: documents can stay out of chat entirely. The user points at a local file path, or declines to share at all, and the intake continues with the fact marked TBD.
+- Sources discovered here drive everything after: derive what you can from them, ask only for what no source can answer. It should never be the other way around.
+
+## Phase 1: guided intake
+
+Order matters. Do not front-load the questionnaire.
+
+1. Identity first: address or ZIP, county if known, builder and plan name (or custom), closing date or a closing packet to parse. One short exchange.
+2. Behind the scenes, before asking anything else:
+   - County public records for the address: property appraiser (lot, square footage, year built, sales history), permit search (pool, cage, HVAC, roof work), GIS parcel viewer. Cite the county pages.
+   - Builder and plan lookup: cookie-cutter plans (Pulte, Lennar, DR Horton, KB, Taylor Morrison) are findable on the web: plan sheets, elevations, standard inclusions. Label plan details as inference when the builder has not confirmed them for this specific house.
+   - Floor plan and measurements hunt: listing photos, builder plan sheets, permit documents. Present what was found and ask "is this accurate?" rather than asking the user to volunteer documents.
+   Present the findings for confirmation, then ask only for what the sources could not determine.
+3. Per must-have area, targeted asks: HVAC (brand and model, or a photo of the data plate; filter size), water (count every unit, fuel type, what it serves; a pool heater is a separate unit), appliances (offer the email lookup for order confirmations and warranty registrations when consented in phase 0), exterior, yard (grass type, trees by count and type, lawn company and its winter cadence), pool, cage, generator, softener, pest contract: present or absent with details.
+   - Completeness probe after every inventory list: "you listed three appliances; is that really everything in the house?" Let the user close their own gaps.
+4. Home automation, with depth: platform, what it controls (lights, locks, irrigation, cameras, thermostats), what runs by itself, and anything the household should know how to override. Ask for the export now, use it in phase 4.
+5. Known issues: anything visible, recurring, or worrying. These become the issue cards.
+6. Who uses the manual: household members. The site assumes non-technical readers.
+
+One batch per topic is fine; the conversation keeps its flow naturally, so do not over-pace and do not interrogate.
 
 ## Phase 2: research (the quality bar)
 
 Per system, research and write the md file. Rules, in order of importance:
 
-- Primary sources only for claims: manufacturer care and warranty PDFs, the builder's warranty book, the state extension service (UF/IFAS in Florida; the equivalent land-grant university per state), FEMA and county code pages, the water management district for watering rules. No blogger recaps as the sole source for a factual claim.
+- Anchor-cited coverage: the must-have list above is the definition of complete. Cite UGA C1082, NCHH, or the HUD toolkit inline for general maintenance claims; cite ASHI Home Systems per system; cite manufacturer documents for product-specific rules; cite the state extension service (UF/IFAS in Florida; the land-grant equivalent per state) for lawn, pest, and climate-tuned guidance.
+- Primary sources only for claims: manufacturer care and warranty PDFs, the builder's warranty book, county and district pages. No blogger recaps as the sole source for a factual claim.
 - Every claim carries an inline markdown link to its source. A claim without a link is a bug.
 - Label estimates as estimates and inferences as inferences, inline.
 - Costs are ranges labeled as estimates, typical for the county's metro area.
@@ -81,24 +104,26 @@ Per system, research and write the md file. Rules, in order of importance:
 - Watering rules come from the water management district's current order, with its expiry date. Fertilizer blackout windows come from the county ordinance.
 - The builder's warranty book is a required source when a builder exists: get the actual national book PDF, cite section numbers for coverage windows, and build the deadlines section from it.
 - Manufacturer care rules: find the actual care bulletin or installation PDF (for example James Hardie's TB20 and HZ10 documents, GAF and Owens Corning shingle care). If the manufacturer is unknown, include both common brands and say so.
+- When a lookup comes up empty, fall back to deeper research tools (web search, page crawls) before turning the question back to the user.
 
 ## Phase 3: write the files
 
-1. Write or update `site-data/profile.json` from the intake. Every unknown stays TBD, never invented.
+1. Write or update `site-data/profile.json` from the intake. Every unknown stays TBD, never invented. Areas the house does not have are recorded as not-present.
 2. Write `site-data/tags.json` per the relevance rule.
 3. Write one md file per system with: `Home:` context line, `Related files:` line, a system snapshot, known issues with warranty angles when any, manufacturer care rules, the Cadence maintenance table, DIY vs pro with cost estimates, what the builder warranty covers for this system, and sources on every claim.
 4. Rewrite `00-index.md` with all the required sections from the contract list, tuned to the county and the house.
-5. Show the user the complete list of proposed writes and the diffs that matter. On approval, write, then build and verify. On refusal, adjust and re-propose.
+5. Run the HUD room-by-room completeness pass against everything gathered; anything it surfaces that the intake missed goes back to the user as one final round of questions.
+6. Show the user the complete list of proposed writes and the diffs that matter. On approval, write, then build and verify. On refusal, adjust and re-propose.
 
 ## Phase 4: Home Assistant and documents, when provided
 
-- HA export: summarize the automations in household language (what the house does by itself). Put the summary in `profile.json` `automation.detail`. A full automation map can become its own md page if the user wants one; add the page to `SYSTEMS` and the files table then.
-- Closing packet, floor plan, survey: parse per the unlocks promised in the intake, store where the user chose in phase 1, and reflect the extracted facts in `profile.json` and the relevant md files. Closing date extracted from the packet replaces TBD in `identity.closing_date` and the deadlines page chip logic goes live.
+- HA export: summarize the automations in household language (what the house does by itself, and how to override it). Put the summary in `profile.json` `automation.detail`. A full automation map can become its own md page if the user wants one; add the page to `SYSTEMS` and the files table then.
+- Closing packet, floor plan, survey: parse per the unlocks promised in the intake, store where the user chose in phase 0, and reflect the extracted facts in `profile.json` and the relevant md files. Closing date extracted from the packet replaces TBD in `identity.closing_date` and the deadlines page chip logic goes live.
 
 ## Phase 5: rebuild and verify
 
 1. `python3 site/build.py` from the repo root. Zero errors.
-2. Verify: every expected page exists; `grep -r '\.md)' site/*.html` finds nothing (all md links rewrote); every system page contains a Cadence table so the ROUTINE panel renders; the calendar table has all twelve months; the three-issue cards appear on the Overview.
+2. Verify: every expected page exists; `grep -r '\.md)' site/*.html` finds nothing (all md links rewrote); every system page contains a Cadence table so the ROUTINE panel renders; the calendar table has all twelve months; the known-issue cards appear on the Overview.
 3. Asset version bumps: if you edited any file under `site/assets/`, bump its `?v=` query in the shell template in `site/build.py` so browsers reload it.
 4. Commit with a message naming the house and the phase. Never push, never force, never commit generated noise outside `site/` and `site-data/`.
 
@@ -106,6 +131,7 @@ Per system, research and write the md file. Rules, in order of importance:
 
 - Approval-first: no file is written without a proposed diff and a yes.
 - Sources on every claim; estimates and inferences labeled; no em dashes.
-- Nothing invented: TBD is a valid value and always better than a guess.
+- Nothing invented: TBD is a valid value and always better than a guess. Not-present is a recorded answer, never a silent skip.
+- Sources the user declined in phase 0 are never opened later.
 - Documents never land in `site/`, only in the repo `docs/` folder or the user's chosen link.
 - No pushes to any remote, no account creation, no purchases, no contacting anyone.
