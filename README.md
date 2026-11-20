@@ -7,7 +7,7 @@ It was built agent-first, for a real house: the skills encode the sourcing rules
 ## The recommended path
 
 1. **Fork or clone this repo.** Your copy is your manual; keep it private, because once you run setup it will hold your house's details. A fork also gives you updates to the engine and skills whenever they land here.
-2. **Open your clone in an agent** (OpenCode registers the skills automatically from `.opencode/skills/`). Any capable agent works: the skills are plain markdown contracts.
+2. **Open your clone in an agent.** Any capable agent works: the skills are plain markdown contracts. OpenCode registers them from `skills/` via the project config; Claude Code and other SKILL.md-compatible agents via the installer below; agents with no skills mechanism (Codex and friends) read `AGENTS.md` at the repo root, which points them at the same files.
 3. **Say "run haus-setup".** It interviews you: builder and plan, closing date, every system and appliance, lawn and trees, county, documents you can share. It researches each system with primary sources, proposes the markdown and data files, and writes them only after you approve.
 4. **Publish from your clone:**
    ```sh
@@ -20,7 +20,7 @@ It was built agent-first, for a real house: the skills encode the sourcing rules
 ## What's inside
 
 ```
-.opencode/skills/     haus-setup (bootstrap a house) + haus-update (change things)
+skills/               haus-setup (bootstrap a house) + haus-update (change things) + install.sh
 site/build.py         the generator: your markdown + data -> static pages in site/
 site/assets/          the runtime: styles, search, month-and-season logic
 site-data/            profile.json + tags.json schemas, with .example files
@@ -28,11 +28,26 @@ public/               the publish kit: deploy guide, single-file artifact export
 docs/                 convention for private documents (closing packet, floor plan, survey); never published
 ```
 
+## Install the skills anywhere
+
+The canonical skills live in `skills/`. To use them in other agents and outside this repo:
+
+```sh
+./skills/install.sh             # symlinks both skills into:
+                                #   ~/.config/opencode/skills  (OpenCode global)
+                                #   ~/.claude/skills            (Claude Code)
+                                #   ~/.agents/skills            (cross-agent convention)
+./skills/install.sh claude      # just one target; targets: opencode, claude, agents, all
+./skills/install.sh --copy all # copy instead of symlink, for agents that do not follow links
+```
+
+Symlinks keep this repo the single source of truth: pulling updates here updates every agent. Agents with no skills mechanism at all read `AGENTS.md` in the repo root, which tells them to load the same SKILL.md files on the same trigger phrases.
+
 ## The build is swappable
 
 `site/build.py` is the reference implementation, not a requirement. The contract is the input and the output, not the language:
 
-- Input: markdown files at repo root plus `site-data/*.json`, per the contracts in `.opencode/skills/haus-setup/SKILL.md`.
+- Input: markdown files at repo root plus `site-data/*.json`, per the contracts in `skills/haus-setup/SKILL.md`.
 - Output: the page set in `site/` (page-per-slug HTML with the runtime hooks, plus `assets/now.json` and `assets/search.json` in the shapes the scripts expect).
 
 Any generator that honors those contracts works: the runtime scripts, the skills, the artifact exporter, and the deploy steps never see the build language. Python is here because it is preinstalled on macOS and the whole converter is stdlib-plus-one-package (`markdown`). If your stack is Node (which the Cloudflare deploy uses anyway), port the two scripts and keep the outputs identical.

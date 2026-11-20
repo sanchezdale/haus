@@ -7,7 +7,7 @@ description: Add to or change an existing House Manual. Verbs cover adding asset
 
 Changes an existing house manual built with the `haus-setup` skill. Same quality bar, same approval-first rule: show the exact proposed change, get a yes, write, rebuild, verify, commit.
 
-Read `.opencode/skills/haus-setup/SKILL.md` for the repo layout, the markdown contracts the build parser depends on, the sourcing rules, the must-have list that defines a complete manual, and the phase 0 consent rule (never open a source the user declined) before the first run of a session.
+Read `skills/haus-setup/SKILL.md` for the repo layout, the markdown contracts the build parser depends on, the sourcing rules, the must-have list that defines a complete manual, and the phase 0 consent rule (never open a source the user declined) before the first run of a session.
 
 ## How every update runs
 
